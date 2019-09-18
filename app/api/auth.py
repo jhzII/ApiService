@@ -1,7 +1,7 @@
 from flask import g
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from app.models import User
-from app.api.errors import error_response
+from app.api.errors import WrongDataError, InvalidTokenError
 
 basic_auth = HTTPBasicAuth()
 token_auth = HTTPTokenAuth()
@@ -18,7 +18,7 @@ def verify_password(username, password):
 
 @basic_auth.error_handler
 def basic_auth_error():
-    return error_response(202, 'Wrong username or password.')
+    raise WrongDataError('Wrong username or password.')
 
 
 @token_auth.verify_token
@@ -29,4 +29,4 @@ def verify_token(token):
 
 @token_auth.error_handler
 def token_auth_error():
-    return error_response(203, 'Invalid token.')
+    raise InvalidTokenError('Invalid token.')

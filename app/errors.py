@@ -1,24 +1,15 @@
 from app import app
-from app.api.errors import error_response as api_error_response
+from flask import make_response, jsonify
+# from app.api.errors import error_response as api_error_response
+import app.api.errors as apiErr
 
 
-@app.errorhandler(404)
-def not_found_error(error):
-    return api_error_response(404)
+@app.errorhandler(Exception)
+def api_error(error):
+    if isinstance(error, apiErr.ApiError):
+        return error.make_response()
 
-
-@app.errorhandler(405)
-def internal_error(error):
-    return api_error_response(405)
-
-
-@app.errorhandler(500)
-def internal_error(error):
-    return api_error_response(500)
-
-
-# from flask import make_response
-#
-# @app.errorhandler(404)
-# def not_found(error):
-#     return make_response(jsonify({'error': 'Not found'}), 404)
+    return make_response(jsonify({
+        'message': 'Internal error',
+        'code': -1
+    }), 500)
