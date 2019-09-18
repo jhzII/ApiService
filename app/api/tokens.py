@@ -29,7 +29,7 @@ def get_token():
         token = generate_confirmation_token(g.current_user)
         return jsonify(
             {'message': 'Email not confirmed. Link to confirm email: ' +
-                        f'<domen>/confirm/{token}', 'code': 201})
+                        f'<domen>/confirm/{token}', 'code': 201})   #TODO
     token = g.current_user.get_token()
     return jsonify({'token': token})
 
