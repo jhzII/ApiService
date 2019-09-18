@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Hello</title>
+</head>
+<body>
+    {% set mark = "." %}
+    {% if name %}
+    <div>{{ "<em>Hello</em>" | safe}}, {{ name + mark }}</div>
+    {% else %}
+    <div>Hello.</div>
+    {% endif %}
+    <div>My global var: {{ my_global_var + mark}}</div>
+</body>
+</html>

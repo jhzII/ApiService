@@ -1,0 +1,17 @@
+# Byte-compiled
+__pycache__/
+
+# IntelliJ project files
+.idea/
+
+# Config
+config.py
+
+# Database
+data.db
+
+#venv
+venv/
+
+# logs
+logs/
