@@ -3,6 +3,7 @@ from flask import jsonify, g
 from app.api import bp
 from app.api.auth import basic_auth, token_auth
 from itsdangerous import URLSafeSerializer, BadSignature
+from app.api.errors import InvalidLincError
 
 
 def generate_confirmation_token(user):
@@ -27,9 +28,9 @@ def confirm_token(token):
 def get_token():
     if not g.current_user.get_confirmed():
         token = generate_confirmation_token(g.current_user)
-        return jsonify(
-            {'message': 'Email not confirmed. Link to confirm email: ' +
-                        f'<domen>/confirm/{token}', 'code': 201})   #TODO
+
+        raise InvalidLincError('Email not confirmed. Link to confirm email: ' +
+                               f'<domen>/confirm/{token}')
     token = g.current_user.get_token()
     return jsonify({'token': token})
 

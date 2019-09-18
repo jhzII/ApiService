@@ -9,12 +9,12 @@ class ApiError(Exception):
         self.api_code = api_code
         self.message = message
 
-    def to_json(self):
+    def make_response(self):
         return make_response(jsonify({
             # 'status': self.api_code,
             'message': self.message,
             'code': self.api_code
-        }), self.api_code)
+        }), self.http_code)
 
 
 class AlreadyConfirmedError(ApiError):
@@ -85,13 +85,6 @@ class EmailUsedError(ApiError):
 
     def __init__(self, message):
         super().__init__(message, http_code=400, api_code=1009)
-
-
-def error_response(status_code, message=None):
-    response = {'code': status_code}
-    if message:
-        response['message'] = message
-    return jsonify(response)
 
 
 # 1000 - Email has already been confirmed.
