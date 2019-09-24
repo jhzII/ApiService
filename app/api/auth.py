@@ -18,7 +18,7 @@ def verify_password(username, password):
 
 @basic_auth.error_handler
 def basic_auth_error():
-    raise WrongDataError('Wrong username or password.')
+    raise WrongDataError()
 
 
 @token_auth.verify_token
@@ -29,4 +29,4 @@ def verify_token(token):
 
 @token_auth.error_handler
 def token_auth_error():
-    raise InvalidTokenError('Invalid token.')
+    raise InvalidTokenError()

@@ -9,9 +9,9 @@ def logging_request(logging_rr=True):
         def wrapper(*args, **kwargs):
             if logging_rr:
                 app.logger.info({'request': request.get_json() or {}})
-            app.logger.info({
-                'user_id': g.current_user.id if 'current_user' in g and g.current_user else None
-            })
+                app.logger.info({
+                    'user_id': g.current_user.id if 'current_user' in g and g.current_user else None
+                })
 
             response = func(*args, **kwargs)
 

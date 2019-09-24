@@ -37,7 +37,7 @@ def get_user(id):
     if not user:
         raise apiErr.NotFoundError('User not found.')
     if g.current_user.get_id != user.get_id:
-        raise apiErr.RightsError('Insufficient rights.')
+        raise apiErr.RightsError()
     return jsonify(user.to_dict(include_email=True))
 
 
@@ -49,7 +49,6 @@ def get_users():
     data = User.to_collection_dict()
     if not data:  # в теории невозможно
         raise apiErr.NotFoundError('Users not found.')
-        # return error_response(303, 'Users not found.')
     return jsonify(data)
 
 
@@ -62,10 +61,10 @@ def create_user():
         raise apiErr.InsufficientDataError('Must include username, email and password fields.')
 
     if User.get_or_none(User.username == data['username']):
-        raise apiErr.NameUsedError('Please use a different username.')
+        raise apiErr.NameUsedError()
 
     if User.get_or_none(User.email == data['email']):
-        raise apiErr.EmailUsedError('Please use a different email address.')
+        raise apiErr.EmailUsedError()
 
     user = User()
     user.from_dict(data, new_user=True)
@@ -84,18 +83,18 @@ def update_user(id):
     user = User.get_or_none(User.id == id)
 
     if not user:
-        raise apiErr.NotFoundError('Users not found.')
+        raise apiErr.NotFoundError()
     if g.current_user.get_id != user.get_id:
-        raise apiErr.RightsError('Insufficient rights.')
+        raise apiErr.RightsError()
 
     data = request.get_json() or {}
 
     if 'username' in data and data['username'] != user.username and \
             User.get_or_none(User.username == data['username']):
-        raise apiErr.NameUsedError('Please use a different username.')
+        raise apiErr.NameUsedError()
     if 'email' in data and data['email'] != user.email and \
             User.get_or_none(User.email == data['email']):
-        raise apiErr.EmailUsedError('Please use a different email address.')
+        raise apiErr.EmailUsedError()
 
     user.from_dict(data, new_user=False)
     user.save()
