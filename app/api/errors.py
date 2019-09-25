@@ -1,14 +1,48 @@
 from flask import make_response, jsonify
 
 
+class ErrorList(object):
+    """ Служит журналом ошибок (singleton). """
+
+    errors_list = []
+
+    def __new__(cls):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(ErrorList, cls).__new__(cls)
+        return cls.instance
+
+    def get_list_dict(self):
+        """ Составляет список со словарями содержащими коды и сообщения ошибок. """
+        data = []
+        for item in self.errors_list:
+            data.append({
+                'http_code': item.http_code,
+                'api_code': item.api_code,
+                'message': item.message
+            })
+        return data
+
+    def get_app_code(self):
+        """ Составляет список со всевозможными кодами ошибок приложения. """
+
+        data = set()
+        for item in self.errors_list:
+            data.add(item.api_code)
+
+        return data
+
+    def get_http_code(self):
+        """ Составляет список со всевозможными кодами http ошибок. """
+
+        data = set()
+        for item in self.errors_list:
+            data.add(item.http_code)
+
+        return data
+
+
 class ApiError(Exception):
     """ Общее api исключение. """
-
-    http_code = None
-    api_code = None
-    message = None
-
-    errors = []
 
     def __init__(self, message, http_code, api_code):
         self.http_code = http_code
@@ -24,12 +58,7 @@ class ApiError(Exception):
     def __init_subclass__(cls, **kwargs):
         """ Переписывает всевозможные коды ошибок в словарь при каждом новом наследовании. """
 
-        cls.errors.append({
-            'http_code': cls.http_code,
-            'api_code': cls.api_code,
-            'message': cls.message
-        })
-
+        ErrorList.errors_list.append(cls)
         super().__init_subclass__(**kwargs)
 
 
