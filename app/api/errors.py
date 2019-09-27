@@ -153,7 +153,7 @@ class InsufficientDataError(ApiError):
 class NameUsedError(ApiError):
     """ Исключение. Переданные данные уже были испольщованы. """
 
-    http_code = 400
+    http_code = 409
     api_code = 1008
     message = 'Please use a different username.'
 
@@ -164,7 +164,7 @@ class NameUsedError(ApiError):
 class EmailUsedError(ApiError):
     """ Исключение. Переданные данные уже были испольщованы. """
 
-    http_code = 400
+    http_code = 409
     api_code = 1009
     message = 'Please use a different email.'
 
