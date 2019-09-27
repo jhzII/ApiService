@@ -55,6 +55,13 @@ class ApiServiceTestCase(unittest.TestCase):
 
     def test_invalid_add_user(self):
         """ Тест неверного добавления пользователя. """
+
+        self.create_user(data={
+            'username': 'unique',
+            'password': 'test_add',
+            'email': 'unique@gg.com'
+        })
+
         params = [{
             'username': 'test_add',
             'password': 'test_add'
@@ -66,13 +73,28 @@ class ApiServiceTestCase(unittest.TestCase):
             'password': 'test_add'
         }, {
             'username': 'test_add'
+        }, {
+            'username': 'unique',
+            'password': 'test_add',
+            'email': 'test_add@gg.com'
+        }, {
+            'username': 'test_add',
+            'password': 'test_add',
+            'email': 'unique@gg.com'
         }, {}]
 
+        # Добавление с отсутсвием необходимых параметров или повторным использованием уникальных.
         for json in params:
             resp = self.app.post('/api/users', json=json)
 
             self.assertEqual(resp.status_code, 400, f'status_code == {resp.status_code}')
-            self.assertEqual(resp.json['code'], 1007, f'code == {resp.json["code"]}')
+
+            if 'username' in json and json['username'] == 'unique':
+                self.assertEqual(resp.json['code'], 1008, f'code == {resp.json["code"]}')
+            elif 'email' in json and json['email'] == 'unique@gg.com':
+                self.assertEqual(resp.json['code'], 1009, f'code == {resp.json["code"]}')
+            else:
+                self.assertEqual(resp.json['code'], 1007, f'code == {resp.json["code"]}')
 
     def test_account_verification(self):
         """ Тест подтверждения email. """
@@ -209,7 +231,7 @@ class ApiServiceTestCase(unittest.TestCase):
 
         # invalid requests
         resp = self.app.get(f'/api/users/{ids[0]}', headers={
-            'Authorization': f"Bearer invalid_token"
+            'Authorization': "Bearer invalid_token"
         })
         self.assertEqual(resp.status_code, 400, f'status_code == {resp.status_code}')
         self.assertEqual(resp.json['code'], 1002, f'code == {resp.json["code"]}')
@@ -243,14 +265,14 @@ class ApiServiceTestCase(unittest.TestCase):
 
         # invalid request
         resp = self.app.get(f'/api/users', headers={
-            'Authorization': f"Bearer invalid_token"
+            'Authorization': "Bearer invalid_token"
         })
         self.assertEqual(resp.status_code, 400, f'status_code == {resp.status_code}')
         self.assertEqual(resp.json['code'], 1002, f'code == {resp.json["code"]}')
 
         # valid request
         resp = self.app.get('/api/users', headers={
-            'Authorization': f"Bearer {token}"
+            'Authorization': f'Bearer {token}'
         })
         data_resp = resp.json['items'][0]
 
@@ -277,7 +299,7 @@ class ApiServiceTestCase(unittest.TestCase):
 
         # invalid request - неверный токен
         resp = self.app.put(f'/api/users/{ids[0]}', headers={
-            'Authorization': f"Bearer invalid_token"
+            'Authorization': "Bearer invalid_token"
         })
         self.assertEqual(resp.status_code, 400, f'status_code == {resp.status_code}')
         self.assertEqual(resp.json['code'], 1002, f'code == {resp.json["code"]}')
@@ -290,7 +312,7 @@ class ApiServiceTestCase(unittest.TestCase):
         self.assertEqual(resp.json['code'], 1005, f'code == {resp.json["code"]}')
 
         # invalid request - измененние несуществуещего профиля
-        resp = self.app.get(f'/api/users/{ids[0] + ids[1]}', headers={
+        resp = self.app.put(f'/api/users/{ids[0] + ids[1]}', headers={
             'Authorization': f"Bearer {tokens[0]}"
         })
         self.assertEqual(resp.status_code, 404, f'status_code == {resp.status_code}')
